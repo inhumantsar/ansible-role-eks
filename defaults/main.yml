@@ -1,0 +1,23 @@
+---
+eks_cluster_name: "demo"
+
+eks_cluster_vpc: "vpc-12345678"
+eks_cluster_subnets: []
+eks_cluster_region: "us-west-2"
+# this is translated to JSON on the fly
+eks_cluster_role:
+  Version": "2012-10-17"
+  Statement:
+    - Effect: "Allow"
+      Principal:
+        Service: "eks.amazonaws.com"
+      Action: "sts:AssumeRole"
+
+eks_authenticator_version: "1.12.7/2019-03-27"
+eks_authenticator_url: "https://amazon-eks.s3-us-west-2.amazonaws.com/{{ eks_authenticator_version }}/bin/linux/amd64/aws-iam-authenticator"
+eks_authenticator_checksum: "sha256:https://amazon-eks.s3-us-west-2.amazonaws.com/{{ eks_authenticator_version }}/bin/linux/amd64/aws-iam-authenticator.sha256"
+
+eks_kubernetes_version: "v1.14.2"
+eks_kubectl_url: https://storage.googleapis.com/kubernetes-release/release/{{ eks_kubernetes_version }}/bin/linux/amd64/kubectl
+eks_kubectl_checksum: "9daf696f5609ab41ac491886de5e87e35d8d3076f65defc27602a476800a97bf"
+

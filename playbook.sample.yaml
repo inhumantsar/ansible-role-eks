@@ -1,0 +1,32 @@
+#### THIS GOES IN THE PLAYBOOK ####
+# requires (pypi) openshift >= 0.6.2
+- name: Expose https port with ClusterIP
+  definition:
+    kind: Pod
+    apiVersion: v1
+    metadata:
+      name: task-pv-pod
+    spec:
+      # not needed for nssp...
+      # volumes:
+      #   - name: task-pv-storage
+      #     persistentVolumeClaim:
+      #     claimName: task-pv-claim
+      containers:
+        - name: task-pv-container
+          image: nginx
+          ports:
+            - containerPort: 80
+              name: "http-server"
+          # volumeMounts:
+          #   - mountPath: "/usr/share/nginx/html"
+          #     name: task-pv-storage
+              
+- route53:
+      state: present
+      zone: foo.com
+      record: my_cluster.foo.com
+      type: CNAME
+      value: {{ caller_facts.endpoint }}
+  
+
