@@ -4,4 +4,4 @@ test:
   variables:
     WORKDIR: "$CI_PROJECT_DIR"
   script:
-    /start.sh -vvv
+    /start.sh

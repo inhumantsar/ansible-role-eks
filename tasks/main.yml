@@ -21,7 +21,7 @@
   ignore_errors: yes
 
 - name: ensure kubectl is installed
-  shell:
+  get_url:
     url: "{{ eks_kubectl_url }}"
     checksum: "{{ eks_kubectl_checksum }}"
     dest: /usr/bin/kubectl
