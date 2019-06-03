@@ -6,6 +6,7 @@
   shell: command -v aws_iam_authenticator >/dev/null 2>&1
   register: aws_iam_authenticator_exists  # var.rc == 0 when binary exists
   ignore_errors: yes
+  check_mode: yes
 
 - name: install aws-iam-authenticator
   get_url:
@@ -19,6 +20,7 @@
   shell: command -v kubectl >/dev/null 2>&1
   register: kubectl_exists  # var.rc == 0 when binary exists
   ignore_errors: yes
+  check_mode: yes
 
 - name: ensure kubectl is installed
   get_url:
