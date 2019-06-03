@@ -19,5 +19,5 @@ eks_authenticator_checksum: "sha256:https://amazon-eks.s3-us-west-2.amazonaws.co
 
 eks_kubernetes_version: "v1.14.2"
 eks_kubectl_url: https://storage.googleapis.com/kubernetes-release/release/{{ eks_kubernetes_version }}/bin/linux/amd64/kubectl
-eks_kubectl_checksum: "9daf696f5609ab41ac491886de5e87e35d8d3076f65defc27602a476800a97bf"
+eks_kubectl_checksum: "sha256:9daf696f5609ab41ac491886de5e87e35d8d3076f65defc27602a476800a97bf"
 
