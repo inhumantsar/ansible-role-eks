@@ -6,29 +6,25 @@
   shell: command -v aws_iam_authenticator >/dev/null 2>&1
   register: aws_iam_authenticator_exists  # var.rc == 0 when binary exists
   ignore_errors: yes
-  delegate_to: local
 
 - name: install aws-iam-authenticator
   get_url:
     url: "{{ eks_authenticator_url }}"
     checksum: "{{ eks_authenticator_checksum }}"
     dest: /usr/bin/aws-iam-authenticator
-  delegate_to: local
   when:
     - aws_iam_authenticator_exists.rc != 0
 
 - name: check that kubectl is on the PATH
-  shell: command -v aws_iam_authenticator >/dev/null 2>&1
+  shell: command -v kubectl >/dev/null 2>&1
   register: kubectl_exists  # var.rc == 0 when binary exists
   ignore_errors: yes
-  delegate_to: local
 
 - name: ensure kubectl is installed
   shell:
     url: "{{ eks_kubectl_url }}"
     checksum: "{{ eks_kubectl_checksum }}"
     dest: /usr/bin/kubectl
-  delegate_to: local
   when:
     - kubectl_exists.rc != 0
 
@@ -84,10 +80,10 @@
     name: "{{ eks_cluster_name }}"
     version: "{{ eks_kubernetes_version }}"
     role_arn: "{{ eks_role.arn }}"
-    subnets: {{ eks_cluster_subnets }}
+    subnets: "{{ eks_cluster_subnets }}"
     security_groups:
-      - {{ eks_control_sg.id }}
-      - {{ eks_worker_sg.id }}
+      - "{{ eks_control_sg.id }}"
+      - "{{ eks_worker_sg.id }}"
   register: eks_cluster
 
 # # at least one storage class definition is recommended for persistent volumes
