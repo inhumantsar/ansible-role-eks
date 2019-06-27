@@ -2,6 +2,7 @@ galaxy_info:
   author: Shaun Martin
   description: Sets up an EKS Cluster with some supporting resources.
   company: Fake Co.
+  role_name: eks
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
