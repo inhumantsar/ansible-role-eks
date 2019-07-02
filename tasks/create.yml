@@ -9,6 +9,9 @@
     url: "{{ eks_authenticator_url }}"
     checksum: "{{ eks_authenticator_checksum }}"
     dest: /usr/bin/aws-iam-authenticator
+    mode: 0755
+    owner: root
+    group: root
   when:
     - aws_iam_authenticator_exists.rc != 0
 
@@ -22,6 +25,9 @@
     url: "{{ eks_kubectl_url }}"
     checksum: "{{ eks_kubectl_checksum }}"
     dest: /usr/bin/kubectl
+    mode: 0755
+    owner: root
+    group: root
   when:
     - kubectl_exists.rc != 0
 
