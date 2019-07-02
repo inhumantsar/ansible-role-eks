@@ -4,17 +4,12 @@
 
 Sets up an EKS Cluster with some supporting resources.
 
-## Using this Cookiecutter Template
-The repo is ready to go for development after answering the cookiecutter questions. There are a few things you will want to tailor before going too far with it:
-
-* Rewrite this README
-* [`meta/main.yml`](meta/main.yml): Add Galaxy tags and tailor the supported platforms list. Ensure the copyright information is correct.
-* [`.travis.yml`](.travis.yml) and/or [`.gitlab-ci.yml`](.gitlab-ci.yml): Add any additional setup or testing tasks.
-* Use [`bumpversion`](https://github.com/peritus/bumpversion) to tag releases and keep your role tidily versioned.
-
 ## Requirements
 
-What does the user need to do ahead of time to ensure this role will work for them?
+1. An existing VPC
+2. At least *two* subnets in *different AZs*
+3. Time. Cluster creation and removal can take up to 20 minutes (though ~10 is normal).
+
 
 ## Supported Platforms
 
@@ -35,13 +30,21 @@ What does the user need to do ahead of time to ensure this role will work for th
 
 ## Variables & Defaults
 
-Use this space to describe the must-change and should-change variables.
+These are the major variables used:
+
+        eks_cluster_state: "present"        # set to absent to remove the cluster
+        eks_cluster_name: "demo"            # make this unique
+        eks_cluster_vpc: "vpc-12345678"     # must already exist
+        eks_cluster_subnets: []             # need at least 2 subnets in different AZs
+        eks_cluster_region: "us-west-2"     # set as appropriate
 
 See [`defaults/main.yml`](defaults/main.yml) for more information.
 
 ## Usage
 
 Provide an example of the role in action.
+
+## Testing
 
 ## Dependencies
 

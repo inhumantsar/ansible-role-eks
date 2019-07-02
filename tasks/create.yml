@@ -1,0 +1,123 @@
+
+- name: check that aws_iam_authenticator is on the PATH locally
+  shell: command -v aws_iam_authenticator >/dev/null 2>&1
+  register: aws_iam_authenticator_exists  # var.rc == 0 when binary exists
+  ignore_errors: yes
+  
+- name: install aws-iam-authenticator
+  get_url:
+    url: "{{ eks_authenticator_url }}"
+    checksum: "{{ eks_authenticator_checksum }}"
+    dest: /usr/bin/aws-iam-authenticator
+  when:
+    - aws_iam_authenticator_exists.rc != 0
+
+- name: check that kubectl is on the PATH
+  shell: command -v kubectl >/dev/null 2>&1
+  register: kubectl_exists  # var.rc == 0 when binary exists
+  ignore_errors: yes
+
+- name: ensure kubectl is installed
+  get_url:
+    url: "{{ eks_kubectl_url }}"
+    checksum: "{{ eks_kubectl_checksum }}"
+    dest: /usr/bin/kubectl
+  when:
+    - kubectl_exists.rc != 0
+
+# https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html
+# control plane: aws rec. 443 from workers and any bastion host security groups; 1025-65535 to workers
+# workers: aws rec. all from workers, 443+1025-65535 from control plane; any to all
+- name: create worker security group
+  ec2_group:
+    name: "{{ eks_worker_sg_name }}"
+    description: k8s Workers 
+    vpc_id: "{{ eks_cluster_vpc }}"
+    region: "{{ eks_cluster_region }}"
+    rules:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+  register: eks_worker_sg
+
+- name: create control plane security group
+  ec2_group:
+    name: "{{ eks_control_sg_name }}"
+    description: k8s Control Plane 
+    vpc_id: "{{ eks_cluster_vpc }}"
+    region: "{{ eks_cluster_region }}"
+    rules:
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        group_name: "{{ eks_worker_sg_name }}"
+    rules_egress: 
+      - proto: tcp
+        ports:
+          - 443
+          - 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        ports:
+          - 1025-65535
+        group_name: "{{ eks_worker_sg_name }}"
+  register: eks_control_sg
+  # of note: sg.group_id  
+
+- name: Create a role with description
+  iam_role:
+    name: "{{ eks_cluster_name }}-{{ eks_cluster_region }}-eks"
+    assume_role_policy_document: "{{ eks_cluster_role_assumerole_policy | to_json }}"
+    managed_policy: "{{ eks_cluster_role_managed_policies }}"
+    description: Basic role to support an EKS cluster
+  register: eks_role
+
+- name: Create the EKS cluster
+  aws_eks_cluster:
+    name: "{{ eks_cluster_name }}"
+    region: "{{ eks_cluster_region }}"
+    role_arn: "{{ eks_role.arn }}"
+    subnets: "{{ eks_cluster_subnets }}"
+    wait: yes
+    security_groups:
+      - "{{ eks_control_sg.group_id }}"
+      - "{{ eks_worker_sg.group_id }}"
+  register: eks_cluster
+
+- debug: var=eks_cluster
+
+# # at least one storage class definition is recommended for persistent volumes
+# - name: Create Slow storage class, backed by AWS EBS
+#   k8s:
+#     definition:
+#       apiVersion: storage.k8s.io/v1
+#       kind: StorageClass
+#       metadata:
+#         name: ebs-hdd
+#       provisioner: kubernetes.io/aws-ebs
+#       parameters:
+#         type: io1
+#         fsType: ext4    
+
+# - name: Create Fast storage class, backed by AWS EBS
+#   k8s:
+#     definition:
+#       apiVersion: storage.k8s.io/v1
+#       kind: StorageClass
+#       metadata:
+#         name: ebs-gp2
+#       provisioner: kubernetes.io/aws-ebs
+#       parameters:
+#         type: gp2
+#         fsType: ext4    
+
+
+
+# - route53:
+#       state: present
+#       zone: foo.com
+#       record: my_cluster.foo.com
+#       type: CNAME
+#       value: {{ caller_facts.endpoint }}
+  
+
+
