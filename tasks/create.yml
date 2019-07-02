@@ -71,6 +71,10 @@
     description: Basic role to support an EKS cluster
   register: eks_role
 
+- name: Sleep to give IAM time to propagate changes
+  wait_for:
+    sleep: 15
+
 - name: Create the EKS cluster
   aws_eks_cluster:
     name: "{{ eks_cluster_name }}"
