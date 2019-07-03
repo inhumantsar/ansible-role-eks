@@ -56,16 +56,6 @@
         from_port: 443
         to_port: 443
         group_name: "{{ eks_worker_sg_name }}"
-    rules_egress: 
-      - proto: tcp
-        ports:
-          - 443
-          - 80
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        ports:
-          - 1025-65535
-        group_name: "{{ eks_worker_sg_name }}"
   register: eks_control_sg
   # of note: sg.group_id  
 
