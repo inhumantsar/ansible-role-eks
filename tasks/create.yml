@@ -40,9 +40,7 @@
     description: k8s Workers 
     vpc_id: "{{ eks_cluster_vpc }}"
     region: "{{ eks_cluster_region }}"
-    rules:
-      - proto: all
-        cidr_ip: 0.0.0.0/0
+    rules: "{{ eks_worker_sg_rules }}"
   register: eks_worker_sg
 
 - name: create control plane security group
@@ -51,11 +49,7 @@
     description: k8s Control Plane 
     vpc_id: "{{ eks_cluster_vpc }}"
     region: "{{ eks_cluster_region }}"
-    rules:
-      - proto: tcp
-        from_port: 443
-        to_port: 443
-        group_name: "{{ eks_worker_sg_name }}"
+    rules: "{{ eks_control_sg_rules }}"
   register: eks_control_sg
   # of note: sg.group_id  
 

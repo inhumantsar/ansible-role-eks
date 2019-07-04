@@ -18,7 +18,15 @@ eks_cluster_role_managed_policies:
   - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
 
 eks_worker_sg_name: "{{ eks_cluster_name }}-k8s-worker"
+eks_worker_sg_rules:
+  - proto: all
+    cidr_ip: 0.0.0.0/0
 eks_control_sg_name: "{{ eks_cluster_name }}-k8s-control"
+eks_control_sg_rules:
+  - proto: tcp
+    from_port: 443
+    to_port: 443
+    group_name: "{{ eks_worker_sg_name }}"
 
 
 eks_authenticator_version: "1.12.7/2019-03-27"
