@@ -10,16 +10,16 @@
     wait: yes       # currently ignored so chances are the rest will fail :(
                     # PR in to hopefully make this better
 
-- name: Remove worker security group
+- name: Remove control plane security group
   ec2_group:
-    name: "{{ eks_worker_sg_name }}"
+    name: "{{ eks_control_sg_name }}"
     vpc_id: "{{ eks_cluster_vpc }}"
     region: "{{ eks_cluster_region }}"
     state: absent
 
-- name: Remove control plane security group
+- name: Remove worker security group
   ec2_group:
-    name: "{{ eks_control_sg_name }}"
+    name: "{{ eks_worker_sg_name }}"
     vpc_id: "{{ eks_cluster_vpc }}"
     region: "{{ eks_cluster_region }}"
     state: absent
