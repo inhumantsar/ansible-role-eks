@@ -64,6 +64,7 @@
 - name: Sleep to give IAM time to propagate changes
   wait_for:
     sleep: 15
+  when: eks_role.changed
 
 - name: Create the EKS cluster
   aws_eks_cluster:
