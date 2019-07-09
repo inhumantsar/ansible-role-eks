@@ -12,6 +12,7 @@
     mode: 0755
     owner: root
     group: root
+  become: true
   when:
     - aws_iam_authenticator_exists.rc != 0
 
@@ -28,8 +29,16 @@
     mode: 0755
     owner: root
     group: root
+  become: true
   when:
     - kubectl_exists.rc != 0
+
+- name: Ensure boto and boto3 modules are installed
+  pip:
+    name: 
+      - boto3
+      - botocore
+
 
 # https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html
 # control plane: aws rec. 443 from workers and any bastion host security groups; 1025-65535 to workers
@@ -69,6 +78,7 @@
 - name: Create the EKS cluster
   aws_eks_cluster:
     name: "{{ eks_cluster_name }}"
+    version: "{{ eks_kubernetes_version }}"
     region: "{{ eks_cluster_region }}"
     role_arn: "{{ eks_role.arn }}"
     subnets: "{{ eks_cluster_subnets }}"
@@ -77,7 +87,37 @@
       - "{{ eks_control_sg.group_id }}"
       - "{{ eks_worker_sg.group_id }}"
   register: eks_cluster
-  
+
+- name: Create an SSH keypair for worker usage
+  ec2_key:
+    name: "{{ eks_worker_cluster_name }}"
+    region: "{{ eks_cluster_region }}"
+    wait: yes
+
+# every EKS cluster can use this same config for general usage.
+# probably not worth breaking out into a custom setup. 
+# this launches workers into public subnets which i don't think we want...
+- name: Launch worker nodes using CloudFormation
+  cloudformation:
+    stack_name: "{{ eks_worker_cluster_name }}"
+    region: "{{ eks_cluster_region }}"
+    template_url: "{{ eks_worker_cloudformation_url }}"
+    disable_rollback: true
+    template_parameters:
+      ClusterName: "{{ eks_cluster_name }}"
+      ClusterControlPlaneSecurityGroup: "{{ eks_control_sg.group_id }}"
+      NodeGroupName: "{{ eks_worker_cluster_name }}"
+      NodeAutoScalingGroupMinSize: "{{ eks_worker_min }}"
+      NodeAutoScalingGroupDesiredCapacity: "{{ eks_worker_desired_count }}"
+      NodeAutoScalingGroupMaxSize: "{{ eks_worker_max }}"
+      NodeInstanceType: "{{ eks_worker_node_type }}"
+      NodeImageId: "{{ eks_worker_node_ami }}"
+      KeyName: "{{ eks_worker_cluster_name }}"
+      VpcId: "{{ eks_cluster_vpc }}"
+      Subnets: "{{ eks_cluster_subnets | join(',') }}"
+  when: "eks_worker_cluster_state == 'present'"
+
+
 # # at least one storage class definition is recommended for persistent volumes
 # - name: Create Slow storage class, backed by AWS EBS
 #   k8s:

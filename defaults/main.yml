@@ -2,20 +2,11 @@
 eks_cluster_name: "demo"
 eks_cluster_state: "present"
 
+eks_kubernetes_version: ''    # defaults to finding latest version, set to be specific
+
 eks_cluster_vpc: "vpc-12345678"
 eks_cluster_subnets: []
 eks_cluster_region: "us-west-2"
-# this is translated to JSON on the fly
-eks_cluster_role_assumerole_policy:
-  Version: "2012-10-17"
-  Statement:
-    - Effect: "Allow"
-      Principal:
-        Service: "eks.amazonaws.com"
-      Action: "sts:AssumeRole"
-eks_cluster_role_managed_policies:
-  - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
-  - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
 
 eks_worker_sg_name: "{{ eks_cluster_name }}-k8s-worker"
 eks_worker_sg_rules:
@@ -28,12 +19,35 @@ eks_control_sg_rules:
     to_port: 443
     group_name: "{{ eks_worker_sg_name }}"
 
+eks_worker_cluster_state: "present"   # set to absent to terminate worker nodes only
+eks_worker_cluster_name: "{{ eks_cluster_name }}-eks-worker-nodes"
+eks_worker_cloudformation_url: https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-02-11/amazon-eks-nodegroup.yaml
+eks_worker_node_type: t3.medium
+eks_worker_node_ami: "ami-03a55127c613349a7" 
+eks_worker_desired_count: 1
+eks_worker_min: 1
+eks_worker_max: 4
+
 
 eks_authenticator_version: "1.12.7/2019-03-27"
 eks_authenticator_url: "https://amazon-eks.s3-us-west-2.amazonaws.com/{{ eks_authenticator_version }}/bin/linux/amd64/aws-iam-authenticator"
 eks_authenticator_checksum: "sha256:https://amazon-eks.s3-us-west-2.amazonaws.com/{{ eks_authenticator_version }}/bin/linux/amd64/aws-iam-authenticator.sha256"
 
 
-eks_kubernetes_version: "1.12.6"
-eks_kubectl_url: https://storage.googleapis.com/kubernetes-release/release/v{{ eks_kubernetes_version }}/bin/linux/amd64/kubectl
+eks_kubectl_version: "1.12.6"
+eks_kubectl_url: https://storage.googleapis.com/kubernetes-release/release/v{{ eks_kubectl_version }}/bin/linux/amd64/kubectl
 eks_kubectl_checksum: "sha256:ff94e3024dd245bf8761fac1b244776b169ade056daec2e1ccaf9b65f1d646ca"
+
+
+# you probably don't need to change this
+# this is translated to JSON on the fly
+eks_cluster_role_assumerole_policy:
+  Version: "2012-10-17"
+  Statement:
+    - Effect: "Allow"
+      Principal:
+        Service: "eks.amazonaws.com"
+      Action: "sts:AssumeRole"
+eks_cluster_role_managed_policies:
+  - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+  - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
