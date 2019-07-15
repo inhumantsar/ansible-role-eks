@@ -116,7 +116,25 @@
       VpcId: "{{ eks_cluster_vpc }}"
       Subnets: "{{ eks_cluster_subnets | join(',') }}"
   when: "eks_worker_cluster_state == 'present'"
+  register: eks_worker_cluster
 
+- debug: var=eks_worker_cluster
+
+- name: set up worker auth
+  k8s:
+    api_version: v1
+    kind: ConfigMap
+    resource_definition:
+      metadata:
+        name: aws-auth
+        namespace: kube-system
+      data:
+        mapRoles: |
+          - rolearn: "{{ eks_worker_cluster.stack_outputs.NodeInstanceRole }}"
+            username: "{{ eks_worker_auth_username }}"
+            groups:
+              - system:bootstrappers
+              - system:nodes  
 
 # # at least one storage class definition is recommended for persistent volumes
 # - name: Create Slow storage class, backed by AWS EBS
