@@ -20,7 +20,7 @@ eks_control_sg_rules:
     group_name: "{{ eks_worker_sg_name }}"
 
 eks_worker_cluster_state: "present"   # set to absent to terminate worker nodes only
-eks_worker_cluster_name: "{{ eks_cluster_name }}-workers"
+eks_worker_cluster_name: "workers"
 eks_worker_cloudformation_url: https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-02-11/amazon-eks-nodegroup.yaml
 eks_worker_node_type: t3.medium
 eks_worker_node_ami: "ami-03a55127c613349a7" 
@@ -37,7 +37,6 @@ eks_kubectl_version: "1.12.6"
 eks_kubectl_url: https://storage.googleapis.com/kubernetes-release/release/v{{ eks_kubectl_version }}/bin/linux/amd64/kubectl
 eks_kubectl_checksum: "sha256:ff94e3024dd245bf8761fac1b244776b169ade056daec2e1ccaf9b65f1d646ca"
 
-
 # you probably don't need to change this
 # this is translated to JSON on the fly
 eks_cluster_role_assumerole_policy:
@@ -50,7 +49,7 @@ eks_cluster_role_assumerole_policy:
 eks_cluster_role_managed_policies:
   - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
   - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
-  
+
 # don't mess with this hackery for unsafe values (see: https://stackoverflow.com/a/52748631/596204)
 eks_worker_auth_username: !unsafe "system:node:{{EC2PrivateDNSName}}"
 

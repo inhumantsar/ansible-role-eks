@@ -7,4 +7,3 @@
 
 - include_tasks: remove.yml
   when: eks_cluster_state == "absent"  
-    

@@ -134,7 +134,7 @@
             username: "{{ eks_worker_auth_username }}"
             groups:
               - system:bootstrappers
-              - system:nodes  
+              - system:nodes
 
 # # at least one storage class definition is recommended for persistent volumes
 # - name: Create Slow storage class, backed by AWS EBS
