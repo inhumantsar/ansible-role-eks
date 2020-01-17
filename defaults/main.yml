@@ -23,7 +23,7 @@ eks_worker_cluster_state: "present"   # set to absent to terminate worker nodes 
 eks_worker_cluster_name: "workers"
 eks_worker_cloudformation_url: https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-02-11/amazon-eks-nodegroup.yaml
 eks_worker_node_type: t3.medium
-eks_worker_node_ami: "ami-03a55127c613349a7" 
+eks_worker_node_ami: "ami-03a55127c613349a7"
 eks_worker_desired_count: 1
 eks_worker_min: 1
 eks_worker_max: 4
@@ -52,5 +52,3 @@ eks_cluster_role_managed_policies:
 
 # don't mess with this hackery for unsafe values (see: https://stackoverflow.com/a/52748631/596204)
 eks_worker_auth_username: !unsafe "system:node:{{EC2PrivateDNSName}}"
-
-
