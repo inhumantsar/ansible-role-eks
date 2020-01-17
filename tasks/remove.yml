@@ -2,36 +2,33 @@
 # tasks file for eks
 - debug: msg="Starting cluster teardown..."
 
-
-- name: Set worker node min/max/desired to zero
-  # cloudformation:
-  #   stack_name: "{{ eks_worker_cluster_name }}"
-  #   region: "{{ eks_cluster_region }}"
-  #   template_url: "{{ eks_worker_cloudformation_url }}"
-  #   disable_rollback: true
-  #   template_parameters:
-  #     ClusterName: "{{ eks_cluster_name }}"
-  #     ClusterControlPlaneSecurityGroup: "{{ eks_control_sg.group_id }}"
-  #     NodeGroupName: "{{ eks_worker_cluster_name }}"
-  #     NodeAutoScalingGroupMinSize: 0
-  #     NodeAutoScalingGroupDesiredCapacity: 0
-  #     NodeAutoScalingGroupMaxSize: 0
-  #     NodeInstanceType: "{{ eks_worker_node_type }}"
-  #     NodeImageId: "{{ eks_worker_node_ami }}"
-  #     KeyName: "{{ eks_worker_cluster_name }}"
-  #     VpcId: "{{ eks_cluster_vpc }}"
-  #     Subnets: "{{ eks_cluster_subnets | join(',') }}"
-
-
-
+# - name: Set worker node min/max/desired to zero
+# cloudformation:
+#   stack_name: "{{ eks_worker_cluster_name }}"
+#   region: "{{ eks_cluster_region }}"
+#   template_url: "{{ eks_worker_cloudformation_url }}"
+#   disable_rollback: true
+#   template_parameters:
+#     ClusterName: "{{ eks_cluster_name }}"
+#     ClusterControlPlaneSecurityGroup: "{{ eks_control_sg.group_id }}"
+#     NodeGroupName: "{{ eks_worker_cluster_name }}"
+#     NodeAutoScalingGroupMinSize: 0
+#     NodeAutoScalingGroupDesiredCapacity: 0
+#     NodeAutoScalingGroupMaxSize: 0
+#     NodeInstanceType: "{{ eks_worker_node_type }}"
+#     NodeImageId: "{{ eks_worker_node_ami }}"
+#     KeyName: "{{ eks_worker_cluster_name }}"
+#     VpcId: "{{ eks_cluster_vpc }}"
+#     Subnets: "{{ eks_cluster_subnets | join(',') }}"
 
 - name: Remove the EKS cluster
   aws_eks_cluster:
     name: "{{ eks_cluster_name }}"
     region: "{{ eks_cluster_region }}"
     state: absent
-    wait: yes       # currently ignored so chances are the rest will fail :(
-                    # PR in to hopefully make this better
+    # currently ignored so chances are the rest will fail :(
+    # PR in to hopefully make this better
+    wait: yes
 
 - name: Remove control plane security group
   ec2_group:
@@ -51,4 +48,3 @@
   iam_role:
     name: "{{ eks_cluster_name }}-eks-role"
     state: absent
-

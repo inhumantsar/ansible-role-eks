@@ -1,3 +1,4 @@
+---
 language: python
 python: "2.7"
 
@@ -14,7 +15,7 @@ addons:
       - python-pip
 
 install:
-  - pip install ansible
+  - pip install ansible yamllint
 
   # version checks
   - ansible --version
@@ -23,6 +24,7 @@ install:
   - printf '[defaults]\nroles_path=../' > ansible.cfg
 
 script:
+  - yamllint .
   - ansible-playbook test.yml --syntax-check
   - ansible-playbook test.yml -vvv -c local -b -i 'localhost,'
   # - ./test/checks.sh # tasks have their own asserts, but this is an option too

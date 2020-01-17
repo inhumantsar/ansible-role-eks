@@ -1,9 +1,9 @@
-
+---
 - name: check that aws_iam_authenticator is on the PATH locally
   shell: command -v aws_iam_authenticator >/dev/null 2>&1
   register: aws_iam_authenticator_exists  # var.rc == 0 when binary exists
   ignore_errors: yes
-  
+
 - name: install aws-iam-authenticator
   get_url:
     url: "{{ eks_authenticator_url }}"
@@ -35,7 +35,7 @@
 
 - name: Ensure boto and boto3 modules are installed
   pip:
-    name: 
+    name:
       - boto3
       - botocore
 
@@ -46,7 +46,7 @@
 - name: create worker security group
   ec2_group:
     name: "{{ eks_worker_sg_name }}"
-    description: k8s Workers 
+    description: k8s Workers
     vpc_id: "{{ eks_cluster_vpc }}"
     region: "{{ eks_cluster_region }}"
     rules: "{{ eks_worker_sg_rules }}"
@@ -55,12 +55,12 @@
 - name: create control plane security group
   ec2_group:
     name: "{{ eks_control_sg_name }}"
-    description: k8s Control Plane 
+    description: k8s Control Plane
     vpc_id: "{{ eks_cluster_vpc }}"
     region: "{{ eks_cluster_region }}"
     rules: "{{ eks_control_sg_rules }}"
   register: eks_control_sg
-  # of note: sg.group_id  
+  # of note: sg.group_id
 
 - name: Create a role with description
   iam_role:
@@ -95,7 +95,7 @@
     wait: yes
 
 # every EKS cluster can use this same config for general usage.
-# probably not worth breaking out into a custom setup. 
+# probably not worth breaking out into a custom setup.
 # this launches workers into public subnets which i don't think we want...
 - name: Launch worker nodes using CloudFormation
   cloudformation:
@@ -147,7 +147,7 @@
 #       provisioner: kubernetes.io/aws-ebs
 #       parameters:
 #         type: io1
-#         fsType: ext4    
+#         fsType: ext4
 
 # - name: Create Fast storage class, backed by AWS EBS
 #   k8s:
@@ -159,9 +159,7 @@
 #       provisioner: kubernetes.io/aws-ebs
 #       parameters:
 #         type: gp2
-#         fsType: ext4    
-
-
+#         fsType: ext4
 
 # - route53:
 #       state: present
@@ -169,6 +167,3 @@
 #       record: my_cluster.foo.com
 #       type: CNAME
 #       value: {{ caller_facts.endpoint }}
-  
-
-
